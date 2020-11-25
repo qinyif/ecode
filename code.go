@@ -1,39 +1,41 @@
-package ecode
+package codes
+
+import "github.com/bytesconv/ecode"
 
 const (
 	// OK is returned on success.
-	OK Ecode = 0
+	OK ecode.Code = 0
 
 	// Canceled indicates the operation was canceled (typically by the caller).
-	Canceled Ecode = 1
+	Canceled ecode.Code = 1
 
 	// Unknown error. An example of where this error may be returned is
 	// if a Status value received from another address space belongs to
 	// an error-space that is not known in this address space. Also
 	// errors raised by APIs that do not return enough error information
 	// may be converted to this error.
-	Unknown Ecode = 2
+	Unknown ecode.Code = 2
 
 	// InvalidArgument indicates client specified an invalid argument.
 	// Note that this differs from FailedPrecondition. It indicates arguments
 	// that are problematic regardless of the state of the system
 	// (e.g., a malformed file name).
-	InvalidArgument Ecode = 3
+	InvalidArgument ecode.Code = 3
 
 	// DeadlineExceeded means operation expired before completion.
 	// For operations that change the state of the system, this error may be
 	// returned even if the operation has completed successfully. For
 	// example, a successful response from a server could have been delayed
 	// long enough for the deadline to expire.
-	DeadlineExceeded Ecode = 4
+	DeadlineExceeded ecode.Code = 4
 
 	// NotFound means some requested entity (e.g., file or directory) was
 	// not found.
-	NotFound Ecode = 5
+	NotFound ecode.Code = 5
 
 	// AlreadyExists means an attempt to create an entity failed because one
 	// already exists.
-	AlreadyExists Ecode = 6
+	AlreadyExists ecode.Code = 6
 
 	// PermissionDenied indicates the caller does not have permission to
 	// execute the specified operation. It must not be used for rejections
@@ -41,11 +43,11 @@ const (
 	// instead for those errors). It must not be
 	// used if the caller cannot be identified (use Unauthenticated
 	// instead for those errors).
-	PermissionDenied Ecode = 7
+	PermissionDenied ecode.Code = 7
 
 	// ResourceExhausted indicates some resource has been exhausted, perhaps
 	// a per-user quota, or perhaps the entire file system is out of space.
-	ResourceExhausted Ecode = 8
+	ResourceExhausted ecode.Code = 8
 
 	// FailedPrecondition indicates operation was rejected because the
 	// system is not in a state required for the operation's execution.
@@ -66,7 +68,7 @@ const (
 	//      REST Get/Update/Delete on a resource and the resource on the
 	//      server does not match the condition. E.g., conflicting
 	//      read-modify-write on the same resource.
-	FailedPrecondition Ecode = 9
+	FailedPrecondition ecode.Code = 9
 
 	// Aborted indicates the operation was aborted, typically due to a
 	// concurrency issue like sequencer check failures, transaction aborts,
@@ -74,7 +76,7 @@ const (
 	//
 	// See litmus test above for deciding between FailedPrecondition,
 	// Aborted, and Unavailable.
-	Aborted Ecode = 10
+	Aborted ecode.Code = 10
 
 	// OutOfRange means operation was attempted past the valid range.
 	// E.g., seeking or reading past end of file.
@@ -91,16 +93,16 @@ const (
 	// error) when it applies so that callers who are iterating through
 	// a space can easily look for an OutOfRange error to detect when
 	// they are done.
-	OutOfRange Ecode = 11
+	OutOfRange ecode.Code = 11
 
 	// Unimplemented indicates operation is not implemented or not
 	// supported/enabled in this service.
-	Unimplemented Ecode = 12
+	Unimplemented ecode.Code = 12
 
 	// Internal errors. Means some invariants expected by underlying
 	// system has been broken. If you see one of these errors,
 	// something is very broken.
-	Internal Ecode = 13
+	Internal ecode.Code = 13
 
 	// Unavailable indicates the service is currently unavailable.
 	// This is a most likely a transient condition and may be corrected
@@ -109,14 +111,14 @@ const (
 	//
 	// See litmus test above for deciding between FailedPrecondition,
 	// Aborted, and Unavailable.
-	Unavailable Ecode = 14
+	Unavailable ecode.Code = 14
 
 	// DataLoss indicates unrecoverable data loss or corruption.
-	DataLoss Ecode = 15
+	DataLoss ecode.Code = 15
 
 	// Unauthenticated indicates the request does not have valid
 	// authentication credentials for the operation.
-	Unauthenticated Ecode = 16
+	Unauthenticated ecode.Code = 16
 
 	_maxCode = 17
 )
