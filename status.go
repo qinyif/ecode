@@ -55,11 +55,11 @@ type Status struct {
 }
 
 // Code returns the status code contained in s.
-func (s *Status) Code() Ecode {
+func (s *Status) Code() Code {
 	if s == nil || s.s == nil {
 		return OK
 	}
-	return Ecode(s.s.Code)
+	return Code(s.s.Code)
 }
 
 // Message returns the message contained in s.
@@ -88,24 +88,24 @@ func (s *Status) Err() error {
 }
 
 // NewStatus returns a Status representing c and msg.
-func NewStatus(e Ecode, msg string) *Status {
+func NewStatus(e Code, msg string) *Status {
 	return &Status{s: &spb.Status{Code: int32(e), Message: msg}}
 }
 
 // NewStatusF returns New(c, fmt.Sprintf(format, a...)).
-func NewStatusf(e Ecode, format string, a ...interface{}) *Status {
+func NewStatusf(e Code, format string, a ...interface{}) *Status {
 	return NewStatus(e, fmt.Sprintf(format, a...))
 }
 
 // Error returns an error representing c and msg.  If c is OK, returns nil.
-func NewError(e Ecode, msg string) error {
+func Error(e Code, msg string) error {
 
 	return NewStatus(e, msg).Err()
 }
 
 // Errorf returns Error(c, fmt.Sprintf(format, a...)).
-func NewErrorf(e Ecode, format string, a ...interface{}) error {
-	return NewError(e, fmt.Sprintf(format, a...))
+func Errorf(e Code, format string, a ...interface{}) error {
+	return Error(e, fmt.Sprintf(format, a...))
 }
 
 // ErrorProto returns an error representing s.  If s.Code is OK, returns nil.
@@ -176,9 +176,9 @@ func (s *Status) Details() []interface{} {
 	return details
 }
 
-// Code returns the Code of the error if it is a Status error, codes.OK if err
+// StatusCode returns the Code of the error if it is a Status error, codes.OK if err
 // is nil, or codes.Unknown otherwise.
-func Code(err error) Ecode {
+func StatusCode(err error) Code {
 	// Don't use FromError to avoid allocation of OK status.
 	if err == nil {
 		return OK

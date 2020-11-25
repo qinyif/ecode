@@ -21,10 +21,10 @@ package ecode
 import (
 	"errors"
 	"fmt"
-	errors2 "github.com/bytesconv/ecode/errors"
 	"reflect"
 	"testing"
 
+	spb "github.com/bytesconv/ecode/rpc"
 	"github.com/golang/protobuf/proto"
 	"github.com/golang/protobuf/ptypes"
 	apb "github.com/golang/protobuf/ptypes/any"
@@ -32,16 +32,15 @@ import (
 	"golang.org/x/net/context"
 	cpb "google.golang.org/genproto/googleapis/rpc/code"
 	epb "google.golang.org/genproto/googleapis/rpc/errdetails"
-	spb "google.golang.org/genproto/googleapis/rpc/status"
 	"google.golang.org/grpc/codes"
 )
 
 func TestErrorsWithSameParameters(t *testing.T) {
 	const description = "some description"
-	e1 := Errorf(codes.AlreadyExists, description)
-	e2 := Errorf(codes.AlreadyExists, description)
+	e1 := Errorf(AlreadyExists, description)
+	e2 := Errorf(AlreadyExists, description)
 	if e1 == e2 || !reflect.DeepEqual(e1, e2) {
-		t.Fatalf("Errors should be equivalent but unique - e1: %v, %v  e2: %p, %v", e1.(*errors2.statusError), e1, e2.(*errors2.statusError), e2)
+		t.Fatalf("Errors should be equivalent but unique - e1: %v, %v  e2: %p, %v", e1.(*statusError), e1, e2.(*statusError), e2)
 	}
 }
 
@@ -61,7 +60,7 @@ func TestFromToProto(t *testing.T) {
 func TestFromNilProto(t *testing.T) {
 	tests := []*Status{nil, FromProto(nil)}
 	for _, s := range tests {
-		if c := s.Code(); c != codes.OK {
+		if c := s.Code(); c != OK {
 			t.Errorf("s: %v - Expected s.Code() = OK; got %v", s, c)
 		}
 		if m := s.Message(); m != "" {
@@ -77,12 +76,12 @@ func TestFromNilProto(t *testing.T) {
 }
 
 func TestError(t *testing.T) {
-	err := Error(codes.Internal, "test description")
+	err := Error(Internal, "test description")
 	if got, want := err.Error(), "rpc error: code = Internal desc = test description"; got != want {
 		t.Fatalf("err.Error() = %q; want %q", got, want)
 	}
 	s, _ := FromError(err)
-	if got, want := s.Code(), codes.Internal; got != want {
+	if got, want := s.Code(), Internal; got != want {
 		t.Fatalf("err.Code() = %s; want %s", got, want)
 	}
 	if got, want := s.Message(), "test description"; got != want {
@@ -91,9 +90,9 @@ func TestError(t *testing.T) {
 }
 
 func TestErrorOK(t *testing.T) {
-	err := Error(codes.OK, "foo")
+	err := Error(OK, "foo")
 	if err != nil {
-		t.Fatalf("Error(codes.OK, _) = %p; want nil", err.(*errors2.statusError))
+		t.Fatalf("Error(OK, _) = %p; want nil", err.(*errors2.statusError))
 	}
 }
 
@@ -105,7 +104,7 @@ func TestErrorProtoOK(t *testing.T) {
 }
 
 func TestFromError(t *testing.T) {
-	code, message := codes.Internal, "test description"
+	code, message := Internal, "test description"
 	err := Error(code, message)
 	s, ok := FromError(err)
 	if !ok || s.Code() != code || s.Message() != message || s.Err() == nil {
@@ -114,7 +113,7 @@ func TestFromError(t *testing.T) {
 }
 
 func TestFromErrorOK(t *testing.T) {
-	code, message := codes.OK, ""
+	code, message := OK, ""
 	s, ok := FromError(nil)
 	if !ok || s.Code() != code || s.Message() != message || s.Err() != nil {
 		t.Fatalf("FromError(nil) = %v, %v; want <Code()=%s, Message()=%q, Err=nil>, true", s, ok, code, message)
@@ -122,7 +121,7 @@ func TestFromErrorOK(t *testing.T) {
 }
 
 type customError struct {
-	Code    codes.Code
+	Code    Code
 	Message string
 	Details []*apb.Any
 }
@@ -142,7 +141,7 @@ func (c customError) GRPCStatus() *Status {
 }
 
 func TestFromErrorImplementsInterface(t *testing.T) {
-	code, message := codes.Internal, "test description"
+	code, message := Internal, "test description"
 	details := []*apb.Any{{
 		TypeUrl: "testUrl",
 		Value:   []byte("testValue"),
@@ -163,7 +162,7 @@ func TestFromErrorImplementsInterface(t *testing.T) {
 }
 
 func TestFromErrorUnknownError(t *testing.T) {
-	code, message := codes.Unknown, "unknown error"
+	code, message := Unknown, "unknown error"
 	err := errors.New("unknown error")
 	s, ok := FromError(err)
 	if ok || s.Code() != code || s.Message() != message {
@@ -172,7 +171,7 @@ func TestFromErrorUnknownError(t *testing.T) {
 }
 
 func TestConvertKnownError(t *testing.T) {
-	code, message := codes.Internal, "test description"
+	code, message := Internal, "test description"
 	err := Error(code, message)
 	s := Convert(err)
 	if s.Code() != code || s.Message() != message {
@@ -181,7 +180,7 @@ func TestConvertKnownError(t *testing.T) {
 }
 
 func TestConvertUnknownError(t *testing.T) {
-	code, message := codes.Unknown, "unknown error"
+	code, message := Unknown, "unknown error"
 	err := errors.New("unknown error")
 	s := Convert(err)
 	if s.Code() != code || s.Message() != message {

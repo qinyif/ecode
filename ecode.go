@@ -11,29 +11,22 @@ var (
 	_codes    = map[int]struct{}{} // register codes.
 )
 
-// A Ecode is an unsigned 32-bit error code as defined in the gRPC spec.
-type Ecode int32
-
 type Codes interface {
 	Err() error
-	Code() Ecode
+	Code() Code
 	Message() string
 	Details() []interface{}
 }
 
-func Register(m map[int]string) {
-	_messages.Store(m)
-}
-
-func (e Ecode) Error() string {
+func (e Code) Error() string {
 	return strconv.FormatInt(int64(e), 10)
 }
 
 // Code return error code
-func (e Ecode) Code() int { return int(e) }
+func (e Code) Code() int { return int(e) }
 
 // Message return error message
-func (e Ecode) Message() string {
+func (e Code) Message() string {
 	if cm, ok := _messages.Load().(map[int]string); ok {
 		if msg, ok := cm[e.Code()]; ok {
 			return msg
@@ -42,22 +35,26 @@ func (e Ecode) Message() string {
 	return e.Error()
 }
 
-// Details return details.
-func (e Ecode) Details() []interface{} { return nil }
+func Register(m map[int]string) {
+	_messages.Store(m)
+}
 
-func New(e int) Ecode {
+// Details return details.
+func (e Code) Details() []interface{} { return nil }
+
+func New(e int) Code {
 	if e <= 1000 {
 		panic("business ecode must greater than 1000")
 	}
 	return add(e)
 }
 
-func add(e int) Ecode {
+func add(e int) Code {
 	if _, ok := _codes[e]; ok {
 		panic(fmt.Sprintf("ecode: %d already exist", e))
 	}
 	_codes[e] = struct{}{}
-	return Ecode(e)
+	return Code(e)
 }
 
 // Cause cause from error to Codes.
@@ -70,6 +67,6 @@ func Cause(err error) Codes {
 }
 
 // EqualError equal error
-func EqualError(e Ecode, err error) bool {
+func EqualError(e Code, err error) bool {
 	return Cause(err).Code() == e
 }
